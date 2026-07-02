@@ -1,8 +1,7 @@
-// client/src/pages/Reports.jsx
-import axios from "axios";
 import dayjs from "dayjs";
 import { useEffect, useState } from "react";
 import socket from "../socket";
+import { reports as reportsAPI } from "../api";
 
 function formatDateInput(d) {
   if (!d) return "";
@@ -69,16 +68,12 @@ export default function Reports() {
     setLoading(true);
     setError(null);
     try {
-      const params = {};
-      if (from) params.from = from;
-      if (to) params.to = to;
-      params.groupBy = groupBy;
-      const res = await axios.get("/api/reports/sales", { params });
-      setData(res.data);
+      const result = await reportsAPI.getSalesReport(from, to, groupBy);
+      setData(result);
       setLastUpdatedAt(new Date());
     } catch (err) {
-      console.error(err);
-      setError(err.response?.data?.error || err.message || "Failed to load");
+      console.error("Failed to load reports:", err);
+      setError(err.message || "Failed to load");
     } finally {
       setLoading(false);
     }
